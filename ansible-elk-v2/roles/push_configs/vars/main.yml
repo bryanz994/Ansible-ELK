@@ -1,0 +1,25 @@
+
+## Elasticsearch ##
+## set node_name ##
+#node_name: "{{ inventory_hostname }}"
+
+## set CA cert path, SSL cert path and SSL key path ##
+
+#es_ca_path: "{{ es_cert_dir }}/ca/ca.crt"
+
+#es_ssl_cert_path: "{{ es_cert_dir }}/{{ GROUP }}/{{ GROUP }}.crt"
+#es_ssl_key_path: "{{ es_cert_dir }}/{{ GROUP }}/{{ GROUP }}.key"
+
+## Kibana ##
+## set server_name ##
+#server_name: "{{ ansible_hostname }}"
+
+## set CA cert path, SSL cert path and SSL key path ##
+#kb_ca_path: "{{ kb_cert_dir }}/ca/ca.crt"
+#kb_ssl_cert_path: "{{ kb_cert_dir }}/kb/kb.crt"
+#kb_ssl_key_path: "{{ kb_cert_dir }}/kb/kb.key"
+
+
+## Metricbeat ##
+## change metricbeat output location ##
+#mb_output_elasticsearch: "https://es-test:9200"

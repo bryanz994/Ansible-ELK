@@ -1,0 +1,14 @@
+- name: Push metricbeat.yml 
+  template:
+    src: metricbeat.yml.j2
+    dest: /etc/metricbeat/metricbeat.yml
+    backup: yes
+
+- name: Push elasticsearch-xpack.yml to MetricBeat modules.d folder.
+  template:
+    src: elasticsearch-xpack.yml.j2
+    dest: /etc/metricbeat/modules.d/elasticsearch-xpack.yml
+    backup: yes
+  tags:
+    - elastic
+

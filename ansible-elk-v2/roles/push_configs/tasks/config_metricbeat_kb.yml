@@ -1,0 +1,13 @@
+- name: Push metricbeat.yml
+  template:
+    src: metricbeat.yml.j2
+    dest: /etc/metricbeat/metricbeat.yml
+    backup: yes
+
+- name: Push kibana-xpack.yml to MetricBeat modules.d folder.
+  template:
+    src: kibana-xpack.yml.j2
+    dest: /etc/metricbeat/modules.d/kibana-xpack.yml
+    backup: yes
+  tags:
+    - kibana

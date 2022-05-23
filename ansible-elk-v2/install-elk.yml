@@ -1,0 +1,45 @@
+- hosts: all
+  vars_prompt:
+    - name: env
+      prompt: Production or Development? Enter p for prod, d for dev.
+     
+  vars:
+#inventory_file will give the absolute full path. Need to split by '/' and take the last column, in this case it's 6.
+#e.g. inventory_file=/etc/logstash/conf.d/bryantest/ansible-elk/cluster1, cluster1 is at position 6
+    cluster_name: "{{ inventory_file.split('/')[5] }}"
+  tasks:
+    - name: common processes, e.g. set hostname, stop firewalld
+      #currently using rhel7.8 iso
+      include_role:
+        name: common
+
+    - name: push installers
+      #remember to change version of ELK in ./roles/push_installers/vars/main.yml
+      include_role:
+        name: push_installers
+
+    - name: create directory for ES, KB, MB
+      #remember to change data/logs path accordingly in ./roles/create_dir/vars/main.yml
+      include_role:
+        name: create_dir 
+
+    - name: gen ssl & ca
+      #remember to change variable name instance_name in ./roles/gen_ca_ssl_csr/vars/main.yml
+      include_role:
+        name: gen_ca_ssl_csr
+   
+    - name: push configs
+      #remember to change CA & SSL path in ./roles/push_configs/vars/main.yml
+      #remember to change vars in ./roles/push_configs/vars/cluster1.yml
+      include_role:
+        name: push_configs
+ 
+    - name: start ELK services
+      include_role:
+        name: start_service 
+
+    - name: setup password 
+      include_role:
+        name: setup_password_interactive
+
+       

@@ -1,0 +1,2 @@
+#es_cert_dir: /etc/elasticsearch/certs
+#kb_cert_dir: /etc/kibana/certs

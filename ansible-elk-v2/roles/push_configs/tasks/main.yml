@@ -1,0 +1,29 @@
+---
+#different variables will be included based on the environment Production or Development
+- name: Push config template for ES/KB/MB and modules.d for MB
+  block:
+    - name: Push config template to Elasticsearch production nodes
+      vars:
+        GROUP: "{{ 'master' if 'master' in group_names else 'hot' if 'hot' in group_names else 'warm' if 'warm' in group_names else 'coordinating' }}"
+      import_tasks: config_es.yml
+      when: ("'es' in group_names") and (env == 'p') 
+     
+    - name: Push config template to Elasticsearch dev nodes
+      vars:
+        GROUP: "{{ 'master' if 'master' in group_names else 'data' if 'data' in group_names else 'coordinating' }}"
+      import_tasks: config_es.yml
+      when: ("'es' in group_names") and (env == 'd')
+     
+    - name: Push config template to Kibana nodes
+      import_tasks: config_kibana.yml
+      when: "'kb' in group_names"
+
+    - name: Push MB config template to ES nodes
+      import_tasks: config_metricbeat_es.yml
+      when: "'es' in group_names"
+
+    - name: Push MB config template to KB nodes
+      import_tasks: config_metricbeat_kb.yml
+      when: "'kb' in group_names"
+
+

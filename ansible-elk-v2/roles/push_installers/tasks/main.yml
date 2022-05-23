@@ -1,0 +1,88 @@
+#when one of the block fails, play will end
+- name: Push installer to ES and install
+  block:
+    - name: Check if elasticsearch exists in this env
+      stat: path=/etc/init.d/elasticsearch
+      register: service_status_es
+    
+    - name: Push installer to Elasticsearch nodes
+      copy:
+        src: "elasticsearch-{{ es_version }}.rpm"
+        dest: /root
+        backup: yes
+      when: not service_status_es.stat.exists
+       
+    - name: yum install elasticsearch
+      yum:
+        name: /root/elasticsearch-{{ es_version }}.rpm
+        state: present
+        disablerepo: "*"
+      when: not service_status_es.stat.exists
+  when: "'es' in group_names"
+  any_errors_fatal: true
+
+- name: Push installer to KB and install
+  block:
+    - name: Check if kibana exists in this env
+      stat: path=/etc/init.d/kibana
+      register: service_status_kb
+
+    - name: Push installer to Kibana nodes
+      copy:
+        src: kibana-{{ kb_version }}.rpm
+        dest: /root
+        backup: yes
+      when: not service_status_kb.stat.exists
+
+    - name: yum install Kibana
+      yum:
+        name: /root/kibana-{{ kb_version }}.rpm
+        state: present
+        disablerepo: "*"
+      when: not service_status_kb.stat.exists
+  when: "'kb' in group_names"
+  any_errors_fatal: true
+
+- name: Push installer to LS and install
+  block:
+  #currently logstash is not running as a service. 
+    - name: Check if logstash exists in this env
+      stat: path=/etc/init.d/logstash
+      register: service_status_ls
+
+    - name: Push installer to LS nodes
+      copy:
+        src: logstash-{{ ls_version }}.rpm
+        dest: /root
+        backup: yes
+      when: not service_status_ls.stat.exists
+
+    - name: yum install LS
+      yum:
+        name: /root/logstash-{{ ls_version }}.rpm
+        state: present
+        disablerepo: "*"
+      when: not service_status_ls.stat.exists
+  when: "'ls' in group_names"
+  any_errors_fatal: true
+
+- name: Push MB installer and install
+  block:
+    - name: Check if metricbeat exists in this env
+      stat: path=/etc/init.d/metricbeat
+      register: service_status_mb
+
+    - name: Push installer to MB nodes
+      copy:
+        src: metricbeat-{{ mb_version }}.rpm
+        dest: /root
+        backup: yes
+      when: not service_status_mb.stat.exists
+
+    - name: yum install MB
+      yum:
+        name: metricbeat-{{ mb_version }}.rpm
+        state: present
+        disablerepo: "*"
+      when: not service_status_mb.stat.exists
+  any_errors_fatal: true

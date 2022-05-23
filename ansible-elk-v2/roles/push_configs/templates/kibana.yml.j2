@@ -1,0 +1,48 @@
+# Kibana is served by a back end server. This setting specifies the port to use.
+server.port: 5601
+server.host: "0.0.0.0"
+server.name: "{{ server_name }}"
+
+elasticsearch.hosts: "https://localhost:9200"
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "{{ es_password }}"
+
+server.ssl.enabled: true
+server.ssl.certificate: "{{ kb_ssl_cert_path }}"
+server.ssl.key: "{{ kb_ssl_key_path }}"
+server.ssl.supportedProtocols: ["TLSv1.2"]
+
+elasticsearch.ssl.certificateAuthorities: "{{ kb_ca_path }}"
+elasticsearch.ssl.verificationMode: certificate
+
+pid.file: "{{ kb_data_path }}/kibana.pid"
+
+logging.dest: "{{ kb_logs_path }}/kibana.log"
+logging.quiet: true
+
+map.tilemap.url: "https://20.26.8.39:8443/geoserver/gwc/service/wmts?layer=adamite:10m-cultural&style=&tilematrixset=EPSG:900913&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg&TileMatrix=EPSG:900913:{z}&TileCol={x}&TileRow={y}"
+map.tilemap.options.minZoom: 1
+map.tilemap.options.maxZoom: 10
+map.includeElasticMapsService: false
+
+monitoring.enabled: true
+monitoring.kibana.collection.enabled: false
+
+monitoring.ui.elasticsearch.hosts: ["https://s1esr8mn4-mn1:9200", "https://s1esr8mn5-mn1:9200", "https://s1esr8mn6-mn1:9200", "https://s1esr8mn7-mn1:9200"]
+monitoring.ui.elasticsearch.username: "monitoring_user"
+monitoring.ui.elasticsearch.password: "P@ssw0rd"
+
+xpack.reporting.encryptionKey: "admz"
+xpack.reporting.enabled: true
+
+xpack.security.audit.enabled: true
+xpack.security.encryptionKey: "admz904cu23kKFDh290dnldSKL92kAJKfd8934sik"
+
+xpack.security.session.idleTimeout: "30m"
+
+server.customResponseHeaders: { "Strict-Transport-Security": "max-age=63072000" }
+
+xpack.encryptedSavedObjects.encryptionKey: "admz904cu23kKFDh290dnldSKL92kAJKfd8934sik"
+
+xpack.maps.showMapVisualizationTypes: true
+

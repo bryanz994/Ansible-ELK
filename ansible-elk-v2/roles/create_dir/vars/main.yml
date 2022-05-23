@@ -1,0 +1,9 @@
+#es_data_path: /data/elasticsearch
+#es_logs_path: /data/logs/elasticsearch
+
+#kb_data_path: /data/kibana
+#kb_logs_path: /data/logs/kibana
+
+#mb_logs_path: /data/logs/metricbeat
+
+#ls_logs_path: /data/logs/logstash

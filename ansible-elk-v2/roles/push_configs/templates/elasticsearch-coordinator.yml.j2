@@ -1,0 +1,47 @@
+cluster.name: {{ cluster_name }}
+node.name: {{ node_name }}-coor
+path.data: {{ es_data_path }}
+path.logs: {{ es_logs_path }}
+
+network.host: ["{{ node_name }}", _local_]
+{% if env == 'p' %}
+transport.host: ["{{ node_name }}-priv"]
+{% else %}
+transport.host: ["{{ node_name }}"]
+{% endif %}
+
+discovery.seed_hosts: {{ seed_hosts | to_json }}
+cluster.initial_master_nodes: {{ initial_master_nodes | to_json }}
+
+node.master: false
+node.data: false
+node.ingest: false
+search.remote.connect: false
+node.ml: false
+
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.key: "{{ es_ssl_key_path_coordinating }}"
+xpack.security.transport.ssl.certificate: "{{ es_ssl_cert_path_coordinating }}"
+xpack.security.transport.ssl.certificate_authorities: "{{ es_ca_path }}"
+xpack.security.transport.ssl.supported_protocols: ["TLSv1.2","TLSv1.3"]
+
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.key: "{{ es_ssl_key_path_coordinating }}"
+xpack.security.http.ssl.certificate: "{{ es_ssl_cert_path_coordinating }}"
+xpack.security.http.ssl.certificate_authorities: "{{ es_ca_path }}"
+xpack.security.http.ssl.supported_protocols: ["TLSv1.2","TLSv1.3"]
+
+xpack.security.audit.enabled: true
+#xpack.security.audit.logfile.events.include: ["access_denied", "anonymous_access_denied", "authentication_failed", "connection_denied", "tampered_request", "run_as_denied", "run_as_granted", "authentication_success"]
+#xpack.security.audit.logfile.events.emit_request_body: true
+xpack.security.audit.logfile.events.ignore_filters.kibana_system.roles: ["kibana_system"]
+
+xpack.monitoring.exporters.remote.type: http
+xpack.monitoring.exporters.remote.host: ["https://admz-mn:9200"]
+xpack.monitoring.exporters.remote.auth.username: elastic
+xpack.monitoring.exporters.remote.auth.password: password
+xpack.monitoring.exporters.remote.ssl.certificate_authorities: ["/etc/elasticsearch/certsCCS/ca/ca.crt"]
+
+#bootstrap.system_call_filter: false
+

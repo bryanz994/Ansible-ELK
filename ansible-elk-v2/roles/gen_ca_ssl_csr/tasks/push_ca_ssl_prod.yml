@@ -1,0 +1,70 @@
+- name: check if path exists
+  vars:
+    path:
+      - master
+      - hot
+      - warm
+      - coordinating
+      - kb
+  stat:
+    path: "{{ role_path }}/files/{{ item }}"
+  with_items: "{{ path }}"
+  register: check_path_name
+  delegate_to: localhost
+
+- name: verifying if path exists
+  debug: 
+    msg: "Path {{ item.item }} exists"
+  with_items: "{{ check_path_name.results }}"
+  when: item.stat.exists
+  delegate_to: localhost
+
+- name: Copy CA and SSl to remote ES nodes (hot/warm/master/coordinating) for production mode
+  block:
+#change **cluster_name** based on the instance name specified in instance.yml
+    - name: copy SSL certs and key to master
+      copy:
+        src: "{{ role_path }}/files/master"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      with_items: "{{ check_path_name.results }}"
+      when: "'master' in group_names and item.item == 'master' and  item.stat.exists"
+
+    - name: copy SSL certs and key to hot
+      copy:
+        src: "{{ role_path }}/files/hot"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      with_items: "{{ check_path_name.results }}"
+      when: "'hot' in group_names and item.item == 'hot' and item.stat.exists"
+
+    - name: copy SSL certs and key to warm
+      copy:
+        src: "{{ role_path }}/files/warm"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      with_items: "{{ check_path_name.results }}"
+      when: "'warm' in group_names and item.item == 'warm' and item.stat.exists"
+ 
+    - name: copy SSL certs and key to coordinating
+      copy:
+        src: "{{ role_path }}/files/coordinating"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      with_items: "{{ check_path_name.results }}"
+      when: "'coordinating' in group_names and item.item == 'coordinating' and item.stat.exists"
+
+    - name: copy SSL certs and key to kb
+      copy:
+        src: "{{ role_path }}/files/kb"
+        dest: "{{ kb_cert_dir }}"
+        owner: kibana
+        group: kibana
+      with_items: "{{ check_path_name.results }}"
+      when: "'kb' in group_names and item.item == 'kb' and item.stat.exists"
+
+  when: env == 'p'

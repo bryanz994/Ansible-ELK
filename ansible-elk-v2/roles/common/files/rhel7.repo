@@ -1,0 +1,5 @@
+[localrepo]
+name=localrepo
+baseurl=file:///mnt/iso
+enabled=1
+gpgcheck=0

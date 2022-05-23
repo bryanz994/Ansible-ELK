@@ -1,0 +1,15 @@
+#- hosts: all
+#  roles:
+#    - hostname
+- name: Generate CA and SSL and CSR (production) 
+  import_tasks: gen_ca_ssl_es.yml
+  when: "'es' in group_names"
+
+- name: Push CA and SSL to the correct directory for ES and KB nodes (production)
+  import_tasks: push_ca_ssl_prod.yml
+  when: ("'es' in group_names or 'kb' in group_names") and (env == 'p')
+
+- name: Push CA and SSL to the correct directory for ES and KB nodes (development)
+  import_tasks: push_ca_ssl_dev.yml
+  when: ("'es' in group_names or 'kb' in group_names") and (env == 'd')
+

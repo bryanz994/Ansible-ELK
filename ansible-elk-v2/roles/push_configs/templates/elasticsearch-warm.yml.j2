@@ -1,0 +1,46 @@
+cluster.name: {{ cluster_name }}
+node.name: {{ node_name }}
+node.attr.rack_id: {{ rack_id }}
+node.attr.nodetype: warm
+node.attr.age: new
+path.data: {{ es_data_path }}
+path.logs: {{ es_logs_path }}
+
+network.host: ["{{ node_name }}", _local_]
+{% if env == 'p' %}
+transport.host: ["{{ node_name }}-priv"]
+{% else %}
+transport.host: ["{{ node_name }}"]
+{% endif %}
+
+discovery.seed_hosts: {{ seed_hosts | to_json }}
+cluster.initial_master_nodes: {{ initial_master_nodes | to_json }}
+
+node.master: false
+node.data: true
+node.ml: false
+
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.key: "{{ es_ssl_key_path }}"
+xpack.security.transport.ssl.certificate: "{{ es_ssl_cert_path }}"
+xpack.security.transport.ssl.certificate_authorities: "{{ es_ca_path }}"
+xpack.security.transport.ssl.supported_protocols: ["TLSv1.2","TLSv1.3"]
+
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.key: "{{ es_ssl_key_path }}"
+xpack.security.http.ssl.certificate: "{{ es_ssl_cert_path }}"
+xpack.security.http.ssl.certificate_authorities: "{{ es_ca_path }}"
+xpack.security.http.ssl.supported_protocols: ["TLSv1.2","TLSv1.3"]
+
+xpack.security.audit.enabled: true
+xpack.security.audit.logfile.events.ignore_filters.kibana_system.roles: ["kibana_system"]
+
+## Using MetricBeats
+#xpack.monitoring.exporters.remote.type: http
+#xpack.monitoring.exporters.remote.host: ["https://s1esr8mn4-mn1:9200","https://s1esr8mn5-mn1:9200","",""]
+#xpack.monitoring.exporters.remote.auth.username: elastic
+#xpack.monitoring.exporters.remote.auth.password: P@ssw0rd
+#xpack.monitoring.exporters.remote.ssl.certificate_authorities: ["/etc/elasticsearch/certs/ca/ca.crt"]
+
+

@@ -1,0 +1,32 @@
+---
+#- name: Debug inventory_file
+#  debug:
+#    msg: "{{ cluster_name }}"
+ 
+#- name: Get variables pertaining to cluster
+#  include_vars: '{{ cluster_name }}.yml'
+
+- name: "Push config template to Elasticsearch {{ GROUP }} nodes"
+  template:
+    src: "elasticsearch-{{ GROUP }}.yml.j2"
+    dest: /etc/elasticsearch/elasticsearch.yml
+    backup: yes
+    owner: elasticsearch
+    group: elasticsearch
+
+- name: "Push log4j2.properties to Elasticsearch {{ GROUP }} nodes"
+  copy:
+    src: log4j2.properties
+    dest: /etc/elasticsearch/log4j2.properties
+    backup: yes
+    owner: elasticsearch
+    group: elasticsearch
+
+- name: "Push jvm.options to Elasticsearch {{ GROUP }} nodes"
+  copy:
+    src: jvm-{{ GROUP }}.options
+    dest: /root/jvm.options
+    backup: yes
+    owner: elasticsearch
+    group: elasticsearch
+

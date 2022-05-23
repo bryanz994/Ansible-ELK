@@ -1,0 +1,11 @@
+- name: start ES service until success
+  include_tasks: start_es.yml
+  when: "'es' in group_names"
+
+- name: start KB service until success
+  include_tasks: start_kb.yml
+  when: "'kb' in group_names"
+ 
+- name: start MB service until success
+  include_tasks: start_mb.yml
+   

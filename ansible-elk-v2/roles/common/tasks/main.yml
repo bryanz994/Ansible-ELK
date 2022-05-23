@@ -1,0 +1,54 @@
+- name: Set hostname on hosts and reboot if hostname is not set
+  block:
+    - name: set hostname on hosts if not set
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: reboot host and wait for it to restart
+      ansible.builtin.reboot:
+        msg: "reboot by ansible"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: whoami
+  when: ansible_hostname == "localhost"
+    
+- name: stop and disable firewalld service
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+#if package is installed, it will return e.g. unzip-6.0-21.el7.x86_64
+#if package is not installed, it will return e.g. package unzip is not installed
+- name: check if unzip package is installed or not
+  command: rpm -q unzip
+  register: package_check
+  run_once: true
+  delegate_to: localhost
+
+- name: mount iso and install unzip if not installed
+  block:
+    - name: copy local.repo to /etc/yum.repos.d
+      copy:
+        src: rhel7.repo
+        dest: /etc/yum.repos.d/local.repo
+
+    - name: create /mnt/iso directory
+      file:
+        state: directory
+        path: /mnt/iso
+
+    - name: mount iso
+      #change rhel iso name accordingly below
+      shell: "mount -o loop {{ role_path }}/files/rhel-server-7.8-x86_64-dvd.iso /mnt/iso"
+
+    - name: yum install unzip
+      yum:
+        name: unzip
+        state: present 
+
+  delegate_to: localhost
+  run_once: true
+  when: package_check.stdout is not search("unzip")

@@ -1,0 +1,56 @@
+
+- name: Copy CA and SSl to remote ES nodes or development mode
+  block:
+#this will output to the remote host path: /etc/elasticsearch/certs/ca
+    - name: copy ca to remote ES nodes
+      copy: 
+        src: "{{ role_path }}/files/ca"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      when: "'es' in group_names"
+
+#this will output to the remote host path: /etc/kibana/certs/ca
+    - name: copy ca to remote KB nodes
+      copy:
+        src: "{{ role_path }}/files/ca"
+        dest: "{{ kb_cert_dir }}"
+        owner: kibana
+        group: kibana
+      when: "'kb' in group_names"
+
+#change **cluster_name** based on the instance name specified in instance.yml
+    - name: copy SSL certs and key to ES master nodes
+      copy:
+        src: "{{ role_path }}/files/master"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      when: "'master' in group_names"
+
+    - name: copy SSL certs and key to ES data nodes
+      copy:
+        src: "{{ role_path }}/files/data"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      when: "'data' in group_names"
+
+    - name: copy SSL certs and key to ES master nodes
+      copy:
+        src: "{{ role_path }}/files/coordinating"
+        dest: "{{ es_cert_dir }}"
+        owner: elasticsearch
+        group: elasticsearch
+      when: "'coordinating' in group_names"
+
+
+    - name: copy SSL certs and key to kb
+      copy:
+        src: "{{ role_path }}/files/kb"
+        dest: "{{ kb_cert_dir }}"
+        owner: kibana
+        group: kibana
+      when: "'kb' in group_names"
+
+  when: env == 'd'

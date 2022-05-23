@@ -1,0 +1,13 @@
+# Module: kibana
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.9/metricbeat-module-kibana.html
+
+- module: kibana
+  xpack.enabled: true
+  period: 10s
+  hosts: ["https://{{ node_name }}:5601"]
+  username: "elastic"
+  password: "{{ es_password }}"
+  ssl.enabled: true
+  ssl.certificate_authorities: "{{ kb_ca_path }}"
+  ssl.verification_mode: "full"
+  

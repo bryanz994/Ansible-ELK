@@ -1,0 +1,8 @@
+
+- name: Push config template to Kibana nodes
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    backup: yes
+    owner: kibana
+    group: kibana

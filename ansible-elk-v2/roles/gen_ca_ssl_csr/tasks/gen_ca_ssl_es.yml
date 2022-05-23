@@ -1,0 +1,118 @@
+
+- name: check if CA file exists
+  stat:
+    path: /etc/elasticsearch/elastic-stack-ca.zip
+  register: ca_result
+
+- name: delete CA if it exists
+  file:
+    path: /etc/elasticsearch/elastic-stack-ca.zip
+    state: absent
+  when: ca_result.stat.exists
+   
+- name: generate CA
+  shell: '/usr/share/elasticsearch/bin/elasticsearch-certutil ca --out /etc/elasticsearch/elastic-stack-ca.zip --pem --pass ""'
+  run_once: true
+
+- name: fetch CA from remote to local
+  fetch:
+    src: /etc/elasticsearch/elastic-stack-ca.zip
+    dest: "{{ role_path }}/files/elastic-stack-ca.zip"
+    flat: yes
+  run_once: true
+
+- name: unzip CA locally
+  shell: "unzip -o {{ role_path }}/files/elastic-stack-ca.zip -d {{ role_path }}/files"
+  run_once: true 
+  delegate_to: localhost
+
+#this will output to the remote host path: /etc/elasticsearch/certs/ca
+- name: copy ca to remote ES nodes
+  copy:
+    src: "{{ role_path }}/files/ca"
+    dest: "{{ es_cert_dir }}"
+    owner: elasticsearch
+    group: elasticsearch
+  when: "'es' in group_names"
+
+#this will output to the remote host path: /etc/kibana/certs/ca
+- name: copy ca to remote KB nodes
+  copy:
+    src: "{{ role_path }}/files/ca"
+    dest: "{{ kb_cert_dir }}"
+    owner: kibana
+    group: kibana
+  when: "'kb' in group_names"
+
+
+- name: push instance_prod.yml when production mode
+  template:
+    src: instance_prod.yml.j2
+    dest: /etc/elasticsearch/instance.yml
+  run_once: true
+  when: env == 'p'
+
+- name: push instance_dev.yml when development mode
+  template:
+    src: instance_dev.yml.j2
+    dest: /etc/elasticsearch/instance.yml
+  run_once: true
+  when: env == 'd'
+
+- name: check if ssl bundle exists
+  stat:
+    path: /etc/elasticsearch/certificate-bundle.zip
+  register: ssl_result
+
+- name: delete if ssl exists
+  file:
+    path: /etc/elasticsearch/certificate-bundle.zip
+    state: absent
+  when: ssl_result.stat.exists
+
+- name: gen ssl certs
+  shell: /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --in /etc/elasticsearch/instance.yml --out /etc/elasticsearch/certificate-bundle.zip
+  run_once: true
+
+- name: fetch ssl from remote to local
+  fetch:
+    src: /etc/elasticsearch/certificate-bundle.zip
+    dest: "{{ role_path }}/files/certificate-bundle.zip"
+    flat: yes
+  run_once: true
+
+- name: unzip SSL certs locally
+  shell: "unzip -o {{ role_path }}/files/certificate-bundle.zip -d {{ role_path }}/files"
+  delegate_to: localhost
+  run_once: true
+
+- name: gen csr when env is production
+  block:
+    - name: check if csr bundle exists
+      stat:
+        path: /etc/elasticsearch/csr.zip
+      register: csr_result
+
+    - name: delete if csr exists
+      file:
+        path: /etc/elasticsearch/csr.zip
+        state: absent
+      when: csr_result.stat.exists
+
+    - name: gen csr
+      shell: '/usr/share/elasticsearch/bin/elasticsearch-certutil csr --in /etc/elasticsearch/instance.yml --out /etc/elasticsearch/csr.zip --pass ""'
+      run_once: true
+
+    - name: fetch csr from remote to local
+      fetch:
+        src: /etc/elasticsearch/csr.zip
+        dest: "{{ role_path }}/../../files/csr.zip"
+        flat: yes
+      run_once: true
+
+    - name: unzip csr locally
+      shell: "unzip -o {{ role_path }}/../../files/csr.zip -d {{ role_path }}/../../files"
+      delegate_to: localhost
+      run_once: true
+  when: env == "p"
+

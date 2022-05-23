@@ -1,0 +1,19 @@
+- name: start MB service until success
+  vars:
+    max_retries: 5
+  block:
+    - name: increment retry count
+      set_fact:
+        retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
+    - name: start MB service
+      ansible.builtin.service:
+        name: metricbeat
+        state: started
+
+  rescue:
+    - fail:
+        msg: Maximum retries of grouped tasks reached
+      when: retry_count | int == max_retries | int
+
+    - include_tasks: start_mb.yml
+

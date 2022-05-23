@@ -1,0 +1,55 @@
+
+- name: create data path and log path for ES
+  block:
+    - name: create data path for ES
+      file:
+        path: "{{ es_data_path }}"
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+
+    - name: create log path for ES
+      file:
+        path: "{{ es_logs_path }}"
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+
+    - name: create tmp location for ES
+      file:
+        path: "{{ es_tmp_path }}"
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+
+  when: "'es' in group_names"
+
+- name: create data path and log path for KB
+  block:
+    - name: create data path for KB
+      file:
+        path: "{{ kb_data_path }}"
+        state: directory
+        owner: kibana
+        group: kibana
+
+    - name: create log path for KB
+      file:
+        path: "{{ kb_logs_path }}"
+        state: directory
+        owner: kibana
+        group: kibana
+
+  when: "'kb' in group_names"
+
+- name: create log path for MB
+  file:
+    path: "{{ mb_logs_path }}"
+    state: directory
+
+
+- name: create log path for LS
+  file:
+    path: "{{ ls_logs_path }}"
+    state: directory 
+  when: "'ls' in group_names"

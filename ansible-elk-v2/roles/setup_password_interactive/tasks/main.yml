@@ -1,0 +1,14 @@
+- name: setup elasticsearch login password
+  block:
+    - name: copy password file to remote host once
+      template:
+        src: password.yml.j2
+        dest: /root/password
+      run_once: true
+
+    - name: setup password interactive
+      shell: /usr/share/elasticsearch/bin/elasticsearch-setup-passwords interactive --batch < password
+      run_once: true
+  when: "'es' in group_names"
+
+

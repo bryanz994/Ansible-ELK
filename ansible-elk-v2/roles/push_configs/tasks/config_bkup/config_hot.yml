@@ -1,0 +1,40 @@
+#- hosts: "{{ es_hosts | default('hot') }}"
+#  vars:
+#    node_name: "{{ ansible_hostname }}"
+#    rack_id: "{{ ansible_hostname.split('-')[0] | lower  }}"
+#  vars_prompt:
+#    - name: cluster_num
+#      prompt: What is the cluster number?
+#      private: no
+
+- name: Debug inventory_file
+  debug:
+    msg: "{{ cluster_name }}"
+ 
+- name: Get variables pertaining to cluster
+  include_vars: '{{ cluster_name }}.yml'
+
+- name: Push config template to Elasticsearch hot data nodes
+  template:
+    src: elasticsearch-hot.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    backup: yes
+    group: elasticsearch
+    owner: elasticsearch
+
+- name: Push log4j2.properties to Elasticsearch hot data nodes
+  copy:
+    src: log4j2.properties
+    dest: /etc/elasticsearch/log4j2.properties
+    backup: yes
+    group: elasticsearch
+    owner: elasticsearch
+
+- name: Push jvm.options to Elasticsearch hot data nodes
+  copy:
+    src: jvm-hot.options
+    dest: /etc/elasticsearch/jvm.options
+    backup: yes
+    group: elasticsearch
+    owner: elasticsearch
+

@@ -1,0 +1,69 @@
+## Elasticsearch ##
+#set node_name 
+node_name: "{{ inventory_hostname }}"
+
+#ansible inventory 'master' group hosts are used for ES master nodes
+seed_hosts: "{{ groups['master'] }}"
+initial_master_nodes: "{{ groups['master'] }}"
+rack_id: "{{ ansible_hostname.split('_')[0] | lower  }}"
+
+#change the elasticsearch password 
+es_password: password
+
+#change the version 
+es_version: 7.13.4-x86_64
+
+#certs directory 
+es_cert_dir: /etc/elasticsearch/certs
+
+#elasticsearch data and logs path 
+es_data_path: /data/elasticsearch
+es_logs_path: /data/logs/elasticsearch
+
+#elasticsearch tmp path for jvm.options 
+es_tmp_path: /var/lib/elasticsearch/tmp
+
+#set CA cert path, SSL cert path and SSL key path 
+es_ca_path: "{{ es_cert_dir }}/ca/ca.crt"
+es_ssl_cert_path: "{{ es_cert_dir }}/{{ GROUP }}/{{ GROUP }}.crt"
+es_ssl_key_path: "{{ es_cert_dir }}/{{ GROUP }}/{{ GROUP }}.key"
+
+
+## Kibana ##
+#change the version 
+kb_version: 7.12.1-x86_64
+
+#certs directory
+kb_cert_dir: /etc/kibana/certs
+
+#kibana data and logs path 
+kb_data_path: /data/kibana
+kb_logs_path: /data/logs/kibana
+
+#set server_name 
+server_name: "{{ ansible_hostname }}"
+
+#set CA cert path, SSL cert path and SSL key path 
+kb_ca_path: "{{ kb_cert_dir }}/ca/ca.crt"
+kb_ssl_cert_path: "{{ kb_cert_dir }}/kb/kb.crt"
+kb_ssl_key_path: "{{ kb_cert_dir }}/kb/kb.key"
+
+
+## Metricbeat ##
+#change the version
+mb_version: 7.13.4-x86_64
+
+#change metricbeat output location 
+mb_output_elasticsearch: "https://es-test:9200"
+
+#metricbeat logs path 
+mb_logs_path: /data/logs/metricbeat
+
+
+## Logstash ##
+#change the version
+ls_version: 7.9.3-x86_64
+
+#logstash logs path 
+ls_logs_path: /data/logs/logstash
+
